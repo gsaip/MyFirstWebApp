@@ -1,5 +1,5 @@
 const express = require('express');
-const sql = require('mssql');
+const mysql = require('mysql2/promise'); // ✅ Use promise-based mysql2
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
@@ -8,29 +8,35 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-//Azure DB connection info
-const config = {
-  user: 'CICD',
-  password: 'Azure@12345',
-  server: 'devnewapp.database.windows.net',
-  database: 'cicd_testDB',
-  options: {
-    encrypt: true,
-    enableArithAbort: true
-  }
-};
+// ✅ Create a connection pool (recommended for scalability)
+const pool = mysql.createPool({
+  host: 'cicd-testdb.can8amiomg45.us-east-1.rds.amazonaws.com',
+  user: 'admin',
+  password: 'AWS$12345',
+  database: 'cicd_testdb',
+  port: 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
 
 app.post('/api/register', async (req, res) => {
   const { name, email } = req.body;
 
   try {
-    await sql.connect(config);
-    await sql.query`INSERT INTO Users (Name, Email) VALUES (${name}, ${email})`;
+    // ✅ Use pool.execute() — no need for connect/close
+    const [result] = await pool.execute(
+      'INSERT INTO Users (Name, Email) VALUES (?, ?)',
+      [name, email]
+    );
     res.status(200).send('Inserted successfully');
   } catch (err) {
-    console.error(err);
+    console.error('Database error:', err);
     res.status(500).send('Database error');
   }
 });
 
-app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+app.listen(3000, () =>
+  console.log('✅ Server running on http://54.197.40.149:3000')
+);
+
