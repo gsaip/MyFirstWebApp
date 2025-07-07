@@ -1,10 +1,10 @@
 body {
   font-family: sans-serif;
-  background-colour: yellow;
   margin: 40px;
 }
 
 input {
+  background-colour: yellow;
   margin: 5px;
   padding: 10px;
   width: 200px;
