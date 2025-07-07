@@ -37,6 +37,6 @@ app.post('/api/register', async (req, res) => {
 });
 
 app.listen(3000, () =>
-  console.log('✅ Server running on http://44.211.140.100/:3000')
+  console.log('✅ Server running on http://3.95.229.203:3000')
 );
 
